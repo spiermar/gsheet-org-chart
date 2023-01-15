@@ -1,28 +1,39 @@
+import { useGoogleApi } from 'react-gapi'
+
 async function loadSheet() {
+    const gapi = useGoogleApi({
+        discoveryDocs: [
+          'https://sheets.googleapis.com/$discovery/rest?version=v4',
+        ],
+        scopes: [
+          'https://www.googleapis.com/auth/spreadsheets.readonly',
+        ],
+      })
+
     let response
     try {
         response = await gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: '1mJEb1S0QK0EdnY_SPoeYBL2reEOLGxtM5i9V1dbxMXE',
         range: 'Foundation Engineering',
-        })
+        });
     } catch (err) {
-        document.getElementById('content').innerText = err.message
-        return
+        document.getElementById('content').innerText = err.message;
+        return;
     }
     const range = response.result
     if (!range || !range.values || range.values.length == 0) {
         document.getElementById('content').innerText = 'No values found.';
-        return
+        return;
     }
 
-    let header = range.values[0]
-    delete range.values[0]
+    let header = range.values[0];
+    delete range.values[0];
 
-    let rows = []
+    let rows = [];
     for (const value of Object.values(range.values)) {
-        rows.push(Object.values(value))
+        rows.push(Object.values(value));
     }
-    return [header, rows]
+    return [header, rows];
 }
 
 async function getPeople() {
@@ -33,7 +44,7 @@ async function getPeople() {
     const positionIndex = header.indexOf('position')
     const areaIndex = header.indexOf('area')
 
-    let people = []
+    let people = [];
     
     rows.forEach(row => {
         people.push({
@@ -50,5 +61,7 @@ async function getPeople() {
             size: ''
         })
     })
-    return people
+    return people;
 }
+
+export { getPeople }
